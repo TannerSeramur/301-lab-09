@@ -65,11 +65,81 @@ function getWeatherData(request, response){
 function Weather(data){
     this.time = new Date(data.time*1000).toString().slice(0,15);
     this.forecast = data.summary;
-    console.log(data.summary);
-    console.log(data.time);
+}
+
+// yelp
+app.get('/yelp', getYelp);
+
+function getYelp(request, response){
+    
+    const URL = (`https://api.yelp.com/v3/businesses/search?latitude=${request.query.data.latitude}&longitude=${request.query.data.longitude}`);
+    return superagent.get(URL)
+    .set({'Authorization' : `Bearer ${process.env.YELP_API_KEY}`})
+    .then( results =>{
+        const yelpArray = [];
+        results.body.businesses.forEach((e)=>{
+            yelpArray.push(new Yelp(e));
+
+        })
+        response.send(yelpArray);
+        })
 
 }
 
+function Yelp(data){
+    this.name = data.name;
+}
+
+// meetup
+app.get('/meetups', getMeetup);
+function getMeetup(request,response){
+    const URL = ``;
+    return superagent.get(URL)
+
+}
+
+function Meetup(data){
+
+}
+
+// movies
+app.get('/movies', getMovie);
+function getMovie(request, response){
+    const URL = `https://api.themoviedb.org/3/movie/76341?api_key=${process.env.MOVIE_API_KEY}&location=${request.query.data.location}`;
+    return superagent.get(URL)
+    .then(results =>{
+        const movieArray = [];
+        results.body.forEach((e)=>{
+            movieArray.push(new Movie(e))
+        })
+        response.send(movieArray);
+    })
+
+}
+
+function Movie(data){
+    this.name = data.name;
+
+}
+
+// hiking
+app.get('/trails', getHike);
+function getHike(request,response){
+    const URL = `https://www.hikingproject.com/data/get-trails?lat=${request.query.data.latitude}&lon=${request.query.data.longitude}&maxDistance=10&key=${process.env.HIKE_API_KEY}`;
+    return superagent.get(URL)
+    .then(results =>{
+        const hikeArray = [];
+        results.body.trails.forEach((e)=>{
+            hikeArray.push(new Hike(e));
+        })
+        response.send(hikeArray);
+    })
+}
+
+function Hike(data){
+    this.name = data.name;
+
+}
 
 
 app.listen(PORT, ()=>{
