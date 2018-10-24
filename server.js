@@ -13,17 +13,33 @@ const app = express();
 
 app.use(cors());
 
+function handleError(err, res){
+    console.log(`ERROR`, err);
+    if(res){res.status(500).send(`sorry no peanuts`);}
+}
+
 app.get('/location', (request, response)=>{
-    const locationData = searchToLatLong(request.query.data);
-    response.send(locationData); 
+    searchToLatLong(request.query.data)
+    .then(locationData=> {
+        response.send(locationData);
+    })
+    .catch(err => handleError(err,response));
 })
 
 function searchToLatLong(query){
-    // const URL =
-    const geoData = require('./data/geo.json');
-    const location = new Location(geoData.results[0]);
-    location.search_query = query;
-    return location;
+    const URL = (`https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.GEOCODE_API_KEY}`);
+    console.log(query);
+    return superagent.get(URL)
+        .then(data =>{
+            // console.log(data);
+            if(!data.body.results.length){ throw `NO DATA`;}
+            else{
+                let location = new Location(data.body.results[0]);
+                location.search_query = query; 
+                // console.log(query);
+                return location;
+            }
+    })
 }
 
 function Location(data){
@@ -32,27 +48,98 @@ function Location(data){
     this.longitude = data.geometry.location.lng;
 }
 
-app.get('/weather', (request, response) => {
-    const weatherData = getWeatherData(request.query.data);
-    response.send(weatherData);
-})
+app.get('/weather',getWeatherData);
 
-function getWeatherData(query){
-    const darksky = require('./data/darksky.json');
-    const weatherArray = [];
-    const weather = darksky.daily.data.forEach((item)=>{
-        weatherArray.push(new Weather(item));
-    })
-    return weatherArray; 
+function getWeatherData(request, response){
+    const URL = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${request.query.data.latitude},${request.query.data.longitude}`;
+    return superagent.get(URL)
+        .then(results => {
+            const weatherArray = [];
+            results.body.daily.data.forEach((day)=>{
+                weatherArray.push(new Weather(day));
+            })
+            response.send(weatherArray);
+        })
 }
 
 function Weather(data){
     this.time = new Date(data.time*1000).toString().slice(0,15);
     this.forecast = data.summary;
-    console.log(data.summary);
+}
+
+// yelp
+app.get('/yelp', getYelp);
+
+function getYelp(request, response){
+    
+    const URL = (`https://api.yelp.com/v3/businesses/search?latitude=${request.query.data.latitude}&longitude=${request.query.data.longitude}`);
+    return superagent.get(URL)
+    .set({'Authorization' : `Bearer ${process.env.YELP_API_KEY}`})
+    .then( results =>{
+        const yelpArray = [];
+        results.body.businesses.forEach((e)=>{
+            yelpArray.push(new Yelp(e));
+
+        })
+        response.send(yelpArray);
+        })
 
 }
 
+function Yelp(data){
+    this.name = data.name;
+}
+
+// meetup
+app.get('/meetups', getMeetup);
+function getMeetup(request,response){
+    const URL = ``;
+    return superagent.get(URL)
+
+}
+
+function Meetup(data){
+
+}
+
+// movies
+app.get('/movies', getMovie);
+function getMovie(request, response){
+    const URL = `https://api.themoviedb.org/3/movie/76341?api_key=${process.env.MOVIE_API_KEY}&location=${request.query.data.location}`;
+    return superagent.get(URL)
+    .then(results =>{
+        const movieArray = [];
+        results.body.forEach((e)=>{
+            movieArray.push(new Movie(e))
+        })
+        response.send(movieArray);
+    })
+
+}
+
+function Movie(data){
+    this.name = data.name;
+
+}
+
+// hiking
+app.get('/trails', getHike);
+function getHike(request,response){
+    const URL = `https://www.hikingproject.com/data/get-trails?lat=${request.query.data.latitude}&lon=${request.query.data.longitude}&maxDistance=10&key=${process.env.HIKE_API_KEY}`;
+    return superagent.get(URL)
+    .then(results =>{
+        const hikeArray = [];
+        results.body.trails.forEach((e)=>{
+            hikeArray.push(new Hike(e));
+        })
+        response.send(hikeArray);
+    })
+}
+
+function Hike(data){
+    this.name = data.name;
+
+}
 
 
 app.listen(PORT, ()=>{
