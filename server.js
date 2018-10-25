@@ -28,18 +28,17 @@ app.get('/location', (request, response)=>{
 
 function searchToLatLong(query){
     const URL = (`https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${process.env.GEOCODE_API_KEY}`);
-    console.log(query);
     return superagent.get(URL)
         .then(data =>{
-            // console.log(data);
             if(!data.body.results.length){ throw `NO DATA`;}
             else{
                 let location = new Location(data.body.results[0]);
                 location.search_query = query; 
-                // console.log(query);
                 return location;
             }
+
     })
+    .catch(err => handleError(err,response));
 }
 
 function Location(data){
@@ -60,6 +59,7 @@ function getWeatherData(request, response){
             })
             response.send(weatherArray);
         })
+        .catch(err => handleError(err,response));
 }
 
 function Weather(data){
@@ -83,6 +83,7 @@ function getYelp(request, response){
         })
         response.send(yelpArray);
         })
+        .catch(err => handleError(err,response));
 
 }
 
@@ -103,24 +104,26 @@ function Meetup(data){
 }
 
 // movies
-app.get('/movies', getMovie);
-function getMovie(request, response){
-    const URL = `https://api.themoviedb.org/3/movie/76341?api_key=${process.env.MOVIE_API_KEY}&location=${request.query.data.location}`;
-    return superagent.get(URL)
-    .then(results =>{
-        const movieArray = [];
-        results.body.forEach((e)=>{
-            movieArray.push(new Movie(e))
-        })
-        response.send(movieArray);
-    })
+// app.get('/movies', getMovie);
+// function getMovie(request, response){
+//     console.log(request.query.data+ 'req query here @@@@@@');
+//     const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${request.query.formatted_query}`;
+//     return superagent.get(URL)
+//     .then(results =>{
+//         const movieArray = [];
+//         results.body.forEach((e)=>{
+//             movieArray.push(new Movie(e))
+//         })
+//         response.send(movieArray);
+//     })
+//     .catch(err => handleError(err,response));
 
-}
+// }
 
-function Movie(data){
-    this.name = data.name;
+// function Movie(data){
+//     this.name = data.name;
 
-}
+// }
 
 // hiking
 app.get('/trails', getHike);
@@ -134,6 +137,7 @@ function getHike(request,response){
         })
         response.send(hikeArray);
     })
+    .catch(err => handleError(err,response));
 }
 
 function Hike(data){

@@ -2,7 +2,7 @@
   "name": "demo",
   "version": "1.0.0",
   "description": "301d39 Server Demo",
-  "main": "search.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
