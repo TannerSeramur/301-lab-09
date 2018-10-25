@@ -104,26 +104,30 @@ function Meetup(data){
 }
 
 // movies
-// app.get('/movies', getMovie);
-// function getMovie(request, response){
-//     console.log(request.query.data+ 'req query here @@@@@@');
-//     const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${request.query.formatted_query}`;
-//     return superagent.get(URL)
-//     .then(results =>{
-//         const movieArray = [];
-//         results.body.forEach((e)=>{
-//             movieArray.push(new Movie(e))
-//         })
-//         response.send(movieArray);
-//     })
-//     .catch(err => handleError(err,response));
+app.get('/movies', getMovie);
 
-// }
+function getMovie(request, response){
+    let city = request.query.data.formatted_query.split(', ').slice(0,1);
+    let data = request.query.data;
+    console.log(city, '%%%%%%%% @@@@@@');
+    const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}&page=1&include_adult=false`;
+    return superagent.get(URL)
+    .then(results =>{
+        const movieArray = [];
+        results.body.results.forEach((e)=>{
+            movieArray.push(new Movie(e))
+        })
+        response.send(movieArray);
+    })
+    .catch(err => handleError(err,response));
 
-// function Movie(data){
-//     this.name = data.name;
+}
 
-// }
+function Movie(data){
+    console.log(data,'************** HI *********')
+    this.title = data.title;
+
+}
 
 // hiking
 app.get('/trails', getHike);
