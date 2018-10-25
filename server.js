@@ -36,9 +36,10 @@ function searchToLatLong(query){
                 location.search_query = query; 
                 return location;
             }
+            
 
     })
-    .catch(err => handleError(err,response));
+    .catch(err => handleError(err));
 }
 
 function Location(data){
@@ -94,12 +95,21 @@ function Yelp(data){
 // meetup
 app.get('/meetups', getMeetup);
 function getMeetup(request,response){
-    const URL = ``;
+    const URL = `https://api.meetup.com/find/upcoming_events?key=${process.env.MEETUP_API_KEY}&sign=true&photo-host=public&page=20`;
     return superagent.get(URL)
-
+    .then(results =>{
+        const meetups = [];
+        results.body.events.forEach((e)=>{
+            meetups.push(new Meetup(e))
+        })
+        response.send(meetups);
+    })
+    .catch(err => handleError(err,response));
 }
 
 function Meetup(data){
+    this.name = data.name;
+    this.group = data.group.name;
 
 }
 
@@ -108,8 +118,7 @@ app.get('/movies', getMovie);
 
 function getMovie(request, response){
     let city = request.query.data.formatted_query.split(', ').slice(0,1);
-    let data = request.query.data;
-    console.log(city, '%%%%%%%% @@@@@@');
+
     const URL = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${city}&page=1&include_adult=false`;
     return superagent.get(URL)
     .then(results =>{
@@ -124,8 +133,8 @@ function getMovie(request, response){
 }
 
 function Movie(data){
-    console.log(data,'************** HI *********')
     this.title = data.title;
+    
 
 }
 
