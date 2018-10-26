@@ -1,18 +1,29 @@
 {
-  "name": "demo",
+  "name": "lab-09",
   "version": "1.0.0",
-  "description": "301d39 Server Demo",
+  "description": "",
   "main": "server.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint ."
   },
-  "author": "Tanner & Pablo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TannerSeramur/301-lab-09.git"
+  },
+  "author": "Tanner Seramur",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TannerSeramur/301-lab-09/issues"
+  },
+  "homepage": "https://github.com/TannerSeramur/301-lab-09#readme",
   "dependencies": {
     "cors": "^2.8.4",
     "dotenv": "^6.1.0",
+    "eslint": "^5.8.0",
     "express": "^4.16.4",
+    "pg": "^7.6.0",
     "superagent": "^4.0.0-beta.5"
   }
 }
