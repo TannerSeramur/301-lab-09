@@ -105,15 +105,18 @@ Weather.prototype.save = function(location){
   values.push(Object.values(this)[0]);
   values.push(Date.now());
   values.push(location.id);
+  console.log(location, '=+=+');
+  console.log(values, '***');
   client.query(SQL,values);
 };
+
 Weather.deleteEntryById = function (id) {
   const SQL = `DELETE FROM weathers WHERE location_id=${id};`;
   client.query(SQL)
     .then(() => {
       console.log('DELETED entry from SQL');
     })
-    .catch(error => handleError(error));
+    .catch(console.error);
 }
 
 Weather.lookup = function(handler) {
@@ -196,6 +199,8 @@ function Yelp(data){
 }
 
 // meetup
+// https://api.meetup.com/find/upcoming_events?&sign=true&photo-host=public&lon=${location.longitude}&page=20&${location.latitude}&key=${process.env.MEETUP_API_KEY}
+
 app.get('/meetups', getMeetup);
 function getMeetup(request,response){
   const URL = `https://api.meetup.com/find/upcoming_events?key=${process.env.MEETUP_API_KEY}&sign=true&photo-host=public&page=20`;
