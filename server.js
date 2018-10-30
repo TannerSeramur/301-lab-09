@@ -8,9 +8,9 @@ const pg = require('pg');
 
 require('dotenv').config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
-const client = new pg.Client(process.env.DATA_BASE_URL)
+const client = new pg.Client(process.env.DATABASE_URL)
 client.connect();
 client.on('err', err=>console.log(err));
 
@@ -22,7 +22,7 @@ function handleError(err, res){
   console.error(err);
   if(res){res.status(500).send(`sorry no peanuts`);}
 }
-app.listen(PORT, ()=>{console.log(`app is running on ${PORT}`)});
+app.listen(PORT, ()=>{ console.log(`app is running on ${PORT}`)});
 
 
 // location object stuff
