@@ -190,7 +190,12 @@ function getYelp(request, response){
 }
 
 function Yelp(data){
+  console.log(data);
   this.name = data.name;
+  this.url = data.url;
+  this.rating = data.rating;
+  this.price = data.price;
+  this.image_url = data.image_url;
 }
 
 
@@ -205,7 +210,6 @@ function getMeetup(request,response){
       results.body.events.forEach((e)=>{
         meetups.push(new Meetup(e))
       })
-      console.log(meetups);
       response.send(meetups);
     })
     .catch(err => handleError(err));
@@ -215,7 +219,7 @@ function Meetup(data){
   this.name = data.name;
   this.link = `https://www.meetup.com/${data.group.urlname}`;
   this.host = data.group.name;
-  this.creation_date = new Date(data.group.created).slice(0,10);
+  this.creation_date = new Date(data.group.created);
 
 }
 
@@ -240,7 +244,12 @@ function getMovie(request, response){
 
 function Movie(data){
   this.title = data.title;
-
+  this.released_on = data.release_date;
+  this.total_votes = data.vote_count;
+  this.average_votes = data.vote_average;
+  this.popularity = data.popularity;
+  this.image_url = `http://image.tmdb.org/t/p/w342${data.poster_path}`;
+  this.overview = data.overview;
 
 }
 
@@ -261,5 +270,12 @@ function getHike(request,response){
 
 function Hike(data){
   this.name = data.name;
-
+  this.trail_url = data.url;
+  this.location = data.location;
+  this.length = data.length;
+  this.condition_date = data.conditionDate;
+  this.conditions = data.conditionStatus;
+  this.stars = data.stars;
+  this.star_votes = data.starVotes;
+  this.summary = data.summary;
 }
