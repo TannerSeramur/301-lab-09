@@ -105,8 +105,6 @@ Weather.prototype.save = function(location){
   values.push(Object.values(this)[0]);
   values.push(Date.now());
   values.push(location.id);
-  console.log(location, '=+=+');
-  console.log(values, '***');
   client.query(SQL,values);
 };
 
@@ -173,12 +171,10 @@ function getWeather(request, response){
   Weather.lookup(handler);
 }
 
-
 // yelp
 app.get('/yelp', getYelp);
 
 function getYelp(request, response){
-
   const URL = (`https://api.yelp.com/v3/businesses/search?latitude=${request.query.data.latitude}&longitude=${request.query.data.longitude}`);
   return superagent.get(URL)
     .set({'Authorization' : `Bearer ${process.env.YELP_API_KEY}`})
@@ -191,25 +187,25 @@ function getYelp(request, response){
       response.send(yelpArray);
     })
     .catch(err => handleError(err));
-
 }
 
 function Yelp(data){
   this.name = data.name;
 }
 
-// meetup
-// https://api.meetup.com/find/upcoming_events?&sign=true&photo-host=public&lon=${location.longitude}&page=20&${location.latitude}&key=${process.env.MEETUP_API_KEY}
 
 app.get('/meetups', getMeetup);
+
 function getMeetup(request,response){
-  const URL = `https://api.meetup.com/find/upcoming_events?key=${process.env.MEETUP_API_KEY}&sign=true&photo-host=public&page=20`;
+
+  const URL = `https://api.meetup.com/find/upcoming_events?&sign=true&photo-host=public&lon=${request.query.data.longitude}&page=20&lat=${request.query.data.latitude}&key=${process.env.MEETUP_API_KEY}`;
   return superagent.get(URL)
     .then(results =>{
       const meetups = [];
       results.body.events.forEach((e)=>{
         meetups.push(new Meetup(e))
       })
+      console.log(meetups);
       response.send(meetups);
     })
     .catch(err => handleError(err));
@@ -217,7 +213,9 @@ function getMeetup(request,response){
 
 function Meetup(data){
   this.name = data.name;
-  this.group = data.group.name;
+  this.link = `https://www.meetup.com/${data.group.urlname}`;
+  this.host = data.group.name;
+  this.creation_date = new Date(data.group.created).slice(0,10);
 
 }
 
